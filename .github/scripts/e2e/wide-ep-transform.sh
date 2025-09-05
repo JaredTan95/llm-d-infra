@@ -41,6 +41,7 @@ patch() {
     ### Swap the model name in custom startup script
     decode_args=$(yq '.decode.containers[0].args[0]' ${FILE})
     export decode_args_updated=$(echo "${decode_args}" | sed 's/'${OLD_MODEL_SED_ESCAPED}'/'${NEW_MODEL_SED_ESCAPED}'/g') # THIS NEEDS TO USE ARGS ABOVE
+    export decode_args_updated=$(echo "${decode_args_updated}" | sed '/--port/a\  --max-model-len 100k \\')
 
     yq e '.decode.containers[0].args[0] = strenv(decode_args_updated)' -i ${FILE}
 
@@ -89,6 +90,7 @@ patch() {
     prefill_args=$(yq '.prefill.containers[0].args[0]' ${FILE})
 
     export prefill_args_updated=$(echo "${prefill_args}" | sed 's/'${OLD_MODEL_SED_ESCAPED}'/'${NEW_MODEL_SED_ESCAPED}'/g') # THIS NEEDS TO USE ARGS ABOVE
+    export prefill_args_updated=$(echo "${prefill_args_updated}" | sed '/--port/a\  --max-model-len 100k \\')
 
     yq e '.prefill.containers[0].args[0] = strenv(prefill_args_updated)' -i ${FILE}
 
